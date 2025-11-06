@@ -18,6 +18,11 @@ pipeline {
         jdk "java-home-25"
         maven "maven-home"
     }
+    
+    triggers {
+        githubPush()
+    }
+
 
     stages {
 
