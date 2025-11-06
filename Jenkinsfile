@@ -29,7 +29,7 @@ pipeline {
 
         stage('Build and Package') {
             steps {
-                bat 'mvn package'
+                sh 'mvn package'
             }
         }
 
