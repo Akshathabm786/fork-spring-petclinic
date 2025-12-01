@@ -3,6 +3,7 @@ pipeline {
     
     environment{
         APP_NAME = "spring_petclinic"
+        BUILD_INFO = "Job_Name: ${env.APP_NAME}\nBuild_Number: ${env.BUILD_NUMBER}"
     }
     parameters{
         string(name:'BRANCH', defaultValue:'main', description:'branches to build')
@@ -20,21 +21,55 @@ pipeline {
     stages {
         stage('Git-Clone') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sumukha47/spring-petclinic.git'
+                git branch: 'main', url: 'https://github.com/Akshathabm786/fork-spring-petclinic.git'
             }
         }
         stage('Build-package') {
             steps {
-                sh 'mvn package'
+                bat 'mvn package'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint:true
             }
         }
     }
-    post{
-        success{
-            mail bcc: '', body: 'This is to inform you that the build is successful ', cc: 'nanditapashranjan35@gmail.com', from: '', replyTo: '', subject: 'Build successful', to: 'sumukhu6@gmail.com'
-        }
-          failure{
-            mail bcc: '', body: 'This is to inform you that the build is failed ', cc: 'nanditapashranjan35@gmail.com', from: '', replyTo: '', subject: 'Build failure', to: 'sumukhu6@gmail.com'
-        }
-    }
+    post {
+    success {
+        mail (
+            to: 'akshatha.1si20et003@gmail.com',
+            cc: '',
+            subject: "SUCCESS: ${APP_NAME}",
+            body: """
+            Hello developers,
+            
+            The Jenkins build has Succeeded
+            ${env.BUILD_INFO}
+            Build URL: ${env.BUILD_URL}
+            Console logs: ${env.BUILD_URL}console
+            Artifacts Download: ${env.BUILD_URL}artifact/target
+
+            Regards,
+            DevOps Team
+"""
+)
+failure {
+    mail (
+        to: 'akshatha.1si20et003@gmail.com',
+            cc: '',
+            subject: "FAILED: ${APP_NAME}",
+            body: """
+            Hello developers,
+            
+            The Jenkins build has Failed
+            ${env.BUILD_INFO}
+            Build URL: ${env.BUILD_URL}
+            Console logs: ${env.BUILD_URL}console
+            Artifacts Download: ${env.BUILD_URL}artifact/target
+
+            Please check the logs to resolve the issue
+
+            Regards,
+            DevOps Team
+"""
+)
+}  
+}
 }
